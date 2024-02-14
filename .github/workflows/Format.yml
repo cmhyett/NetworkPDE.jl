@@ -1,11 +1,25 @@
-name: Format suggestions
-on:
-  pull_request:
-jobs:
-  code-style:
-    runs-on: ubuntu-latest
-    permissions:
-        contents: read
-        pull-requests: write
-    steps:
-      - uses: julia-actions/julia-format@v2
+name: 'Format suggestion with JuliaFormatter.jl'
+description: "Formats your Julia files and suggest changes"
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/checkout@v4
+    - uses: julia-actions/setup-julia@v1
+    - uses: julia-actions/cache@v1
+    - name: 'Install JuliaFormatter'
+      run: |
+        julia -e '
+          using Pkg
+          Pkg.add("JuliaFormatter")'
+      shell: bash
+    - name: 'Format'
+      run: |
+        julia -e '
+          using JuliaFormatter
+          format(".", SciMLStyle())'
+      shell: bash
+    - name: 'Suggest'
+      uses: reviewdog/action-suggester@v1
+      with:
+        tool_name: JuliaFormatter
+        fail_on_error: true

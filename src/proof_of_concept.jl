@@ -8,7 +8,7 @@ function graphplot(g::AbstractGraph)
             [v_positions[e.src][1], v_positions[e.dst][1]],
             [v_positions[e.src][2], v_positions[e.dst][2]],
             color = :black,
-            linewidth = 5,
+            linewidth = 5
         )
     end
     scatter!(p, v_positions, markersize = 8, color = :blue)
@@ -16,14 +16,14 @@ function graphplot(g::AbstractGraph)
     return p
 end
 
-
 # interior updates
 function dρ(ρ, ϕ, dx, dt)
-    return @. -(1 / dx) * (ϕ[2:end] - ϕ[1:end-1])
+    return @. -(1 / dx) * (ϕ[2:end] - ϕ[1:(end - 1)])
 end
 function dϕ_interior(ρ, ϕ, dx, dt)
-    return @. -(dt / dx) * (p(ρ[2:end]) - p(ρ[1:end-1])) -
-              (β * dt) * (ϕ[2:end-1] * abs(ϕ[2:end-1])) / (ρ[1:end-1] + ρ[2:end])
+    return @. -(dt / dx) * (p(ρ[2:end]) - p(ρ[1:(end - 1)])) -
+              (β * dt) * (ϕ[2:(end - 1)] * abs(ϕ[2:(end - 1)])) /
+              (ρ[1:(end - 1)] + ρ[2:end])
 end
 function get_dvs(g::MetaGraph)
     edge_dvs = vcat([[get_prop(g, edge, :dvs)...] for edge in edges(g)]...)
@@ -49,17 +49,16 @@ function create_system(g::AbstractGraph, t, dx, params)
     dx = 25.0
     Dt = Differential(t)
 
-
     function get_incoming_edges(
-        vertex,
-        graph::MetaGraph,
+            vertex,
+            graph::MetaGraph
     )::Vector{Graphs.SimpleGraphs.SimpleEdge}
         edge_list = [e.dst == vertex ? e : nothing for e in edges(g)]
         return edge_list[findall(x -> x != nothing, edge_list)]
     end
     function get_outgoing_edges(
-        vertex,
-        graph::MetaGraph,
+            vertex,
+            graph::MetaGraph
     )::Vector{Graphs.SimpleGraphs.SimpleEdge}
         edge_list = [e.src == vertex ? e : nothing for e in edges(g)]
         return edge_list[findall(x -> x != nothing, edge_list)]
@@ -69,8 +68,8 @@ function create_system(g::AbstractGraph, t, dx, params)
         return edge_list[findall(x -> x != nothing, edge_list)]
     end
     function get_edge_signs(
-        vertex,
-        edges::Vector{Graphs.SimpleGraphs.SimpleEdge},
+            vertex,
+            edges::Vector{Graphs.SimpleGraphs.SimpleEdge}
     )::Vector{Int}
         return [e.dst == vertex ? 1 : -1 for e in edges]
     end
@@ -78,9 +77,8 @@ function create_system(g::AbstractGraph, t, dx, params)
         return π * (get_prop(g, edge, :D) / 2)^2
     end
     function get_bdy_flux(vertex, params, t)
-        return params[(vertex-1)*length(params_tsteps)+floor(Int, t / param_dt)+1]
+        return params[(vertex - 1) * length(params_tsteps) + floor(Int, t / param_dt) + 1]
     end
-
 
     for edge in edges(g)
         i += 1
@@ -89,15 +87,13 @@ function create_system(g::AbstractGraph, t, dx, params)
         sym = Symbol(":ρ_e$(i)")
         ρ = only(@variables($sym(t)[1:num_dx]))
         sym = Symbol(":ϕ_e$(i)")
-        ϕ = only(@variables($sym(t)[1:num_dx+1]))
+        ϕ = only(@variables($sym(t)[1:(num_dx + 1)]))
         append!(
             eqs,
             Symbolics.scalarize.(
-                [
-                    Dt.(ρ) .~ dρ(ρ, ϕ, dx, dt)
-                    Dt.(ϕ[2:end-1]) .~ dϕ_interior(ρ, ϕ, dx, dt)
-                ]
-            ),
+                [Dt.(ρ) .~ dρ(ρ, ϕ, dx, dt)
+                 Dt.(ϕ[2:(end - 1)]) .~ dϕ_interior(ρ, ϕ, dx, dt)]
+            )
         )
         set_prop!(g, edge, :dvs, [ρ, ϕ])
     end
@@ -150,10 +146,8 @@ function create_system(g::AbstractGraph, t, dx, params)
         ρ, ϕ = get_prop(g, edge, :dvs)
         append!(
             eqs,
-            [
-                Dt(ϕ[1]) ~ dϕ_lbdy(g, edge, dx, dt)
-                Dt(ϕ[end]) ~ dϕ_rbdy(g, edge, dx, dt)
-            ],
+            [Dt(ϕ[1]) ~ dϕ_lbdy(g, edge, dx, dt)
+             Dt(ϕ[end]) ~ dϕ_rbdy(g, edge, dx, dt)]
         )
     end
     eqs = Vector{Equation}(eqs)
@@ -173,7 +167,7 @@ function run_example()
     e1_params = Dict(:L => 100.0, :λ => 0.11, :D => 0.25)
     e2_params = Dict(:L => 50.0, :λ => 0.11, :D => 0.25)
     edge_dict = Dict(1 => e1_params, 2 => e2_params)
-    [add_vertex!(g, vertex_dict[i]) for i = 1:length(vertex_dict)]
+    [add_vertex!(g, vertex_dict[i]) for i in 1:length(vertex_dict)]
     add_edge!(g, 1, 2, e1_params)
     add_edge!(g, 2, 3, e2_params)
 
@@ -192,7 +186,7 @@ function run_example()
         sys,
         ones(length(sys.eqs)),
         tspan,
-        Symbolics.scalarize(params .=> zeros(length(params))),
+        Symbolics.scalarize(params .=> zeros(length(params)))
     )
     sol = solve(prob, Euler(), adaptive = false, dt = dt)
 
@@ -201,7 +195,7 @@ function run_example()
 
     #optimization loop
     p0 = ones(length(params))
-    for i = 1:1000
+    for i in 1:1000
         println(loss(p0))
         gs = gradient(loss, p0)[1]
         p0 -= η * gs
