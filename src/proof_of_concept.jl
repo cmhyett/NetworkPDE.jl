@@ -1,6 +1,3 @@
-using Symbolics, OrdinaryDiffEq, ModelingToolkit, SciMLSensitivity, Zygote, Graphs, MetaGraphs, Plots, NetworkLayout;
-
-@register_symbolic Base.floor(T::Type, x)::UInt64
 
 function graphplot(g::AbstractGraph)
     p = plot()
@@ -138,44 +135,46 @@ function create_system(g::AbstractGraph, t, dx, params)
     return de;
 end
 
-# specify network
-g = MetaGraph();
-v1_params = Dict(:is_flux => true, :flux=>zeros(3));
-v2_params = Dict(:is_flux => true, :flux=>zeros(3));
-v3_params = Dict(:is_flux => true, :flux=>zeros(3));
-vertex_dict = Dict(1=>v1_params, 2=>v2_params, 3=>v3_params);
-e1_params = Dict(:L => 100.0,
-                 :λ => 0.11,
-                 :D => 0.25);
-e2_params = Dict(:L => 50.0,
-                 :λ => 0.11,
-                 :D => 0.25);
-edge_dict = Dict(1=>e1_params, 2=>e2_params);
-[add_vertex!(g, vertex_dict[i]) for i in 1:length(vertex_dict)]
-add_edge!(g, 1,2, e1_params);
-add_edge!(g, 2,3, e2_params);
+function run_example()
+    # specify network
+    g = MetaGraph();
+    v1_params = Dict(:is_flux => true, :flux=>zeros(3));
+    v2_params = Dict(:is_flux => true, :flux=>zeros(3));
+    v3_params = Dict(:is_flux => true, :flux=>zeros(3));
+    vertex_dict = Dict(1=>v1_params, 2=>v2_params, 3=>v3_params);
+    e1_params = Dict(:L => 100.0,
+                     :λ => 0.11,
+                     :D => 0.25);
+    e2_params = Dict(:L => 50.0,
+                     :λ => 0.11,
+                     :D => 0.25);
+    edge_dict = Dict(1=>e1_params, 2=>e2_params);
+    [add_vertex!(g, vertex_dict[i]) for i in 1:length(vertex_dict)]
+    add_edge!(g, 1,2, e1_params);
+    add_edge!(g, 2,3, e2_params);
 
-# discretize network
-@variables t
-@parameters params[1:9] #current limitations disallow programmatic instantiation of parameters
-p(ρ) = 5^2 * ρ
-β = 0.001
-tspan = (0.0, 1.0)
-dt = 0.25;
-param_dt = 0.5;
-params_tsteps = tspan[1]:param_dt:tspan[end]
-sys = create_system(g, t, dx, params)
-sys = structural_simplify(sys);
-prob = ODEProblem(sys, ones(length(sys.eqs)), tspan, Symbolics.scalarize(params.=>zeros(length(params))))
-sol = solve(prob, Euler(), adaptive=false, dt=dt)
+    # discretize network
+    @variables t
+    @parameters params[1:9] #current limitations disallow programmatic instantiation of parameters
+    p(ρ) = 5^2 * ρ
+    β = 0.001
+    tspan = (0.0, 1.0)
+    dt = 0.25;
+    param_dt = 0.5;
+    params_tsteps = tspan[1]:param_dt:tspan[end]
+    sys = create_system(g, t, dx, params)
+    sys = structural_simplify(sys);
+    prob = ODEProblem(sys, ones(length(sys.eqs)), tspan, Symbolics.scalarize(params.=>zeros(length(params))))
+    sol = solve(prob, Euler(), adaptive=false, dt=dt)
 
-loss(p) = sum(abs2, 2.0 .- solve(prob, Euler(), adaptive=false, dt=dt, p=p)[end]);
-η = 1e-1;
+    loss(p) = sum(abs2, 2.0 .- solve(prob, Euler(), adaptive=false, dt=dt, p=p)[end]);
+    η = 1e-1;
 
-#optimization loop
-p0 = ones(length(params));
-for i in 1:1000
-    println(loss(p0))
-    gs = gradient(loss, p0)[1]
-    p0 -= η * gs;
+    #optimization loop
+    p0 = ones(length(params));
+    for i in 1:1000
+        println(loss(p0))
+        gs = gradient(loss, p0)[1]
+        p0 -= η * gs;
+    end
 end
