@@ -168,8 +168,8 @@ function run_example()
     )
     sol = solve(prob, Euler(), adaptive = false, dt = dt)
 
-    loss(p) = sum(abs2, 2.0 .- solve(prob, Euler(), adaptive=false, dt=dt, p=p)[end]);
-    η = 1e-1;
+    loss(p) = sum(abs2, 2.0 .- solve(prob, Euler(), adaptive = false, dt = dt, p = p)[end])
+    η = 1e-1
 
     #optimization loop
     p0 = ones(length(params));
