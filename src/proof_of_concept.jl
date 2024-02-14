@@ -137,21 +137,17 @@ end
 
 function run_example()
     # specify network
-    g = MetaGraph();
-    v1_params = Dict(:is_flux => true, :flux=>zeros(3));
-    v2_params = Dict(:is_flux => true, :flux=>zeros(3));
-    v3_params = Dict(:is_flux => true, :flux=>zeros(3));
-    vertex_dict = Dict(1=>v1_params, 2=>v2_params, 3=>v3_params);
-    e1_params = Dict(:L => 100.0,
-                     :λ => 0.11,
-                     :D => 0.25);
-    e2_params = Dict(:L => 50.0,
-                     :λ => 0.11,
-                     :D => 0.25);
-    edge_dict = Dict(1=>e1_params, 2=>e2_params);
-    [add_vertex!(g, vertex_dict[i]) for i in 1:length(vertex_dict)]
-    add_edge!(g, 1,2, e1_params);
-    add_edge!(g, 2,3, e2_params);
+    g = MetaGraph()
+    v1_params = Dict(:is_flux => true, :flux => zeros(3))
+    v2_params = Dict(:is_flux => true, :flux => zeros(3))
+    v3_params = Dict(:is_flux => true, :flux => zeros(3))
+    vertex_dict = Dict(1 => v1_params, 2 => v2_params, 3 => v3_params)
+    e1_params = Dict(:L => 100.0, :λ => 0.11, :D => 0.25)
+    e2_params = Dict(:L => 50.0, :λ => 0.11, :D => 0.25)
+    edge_dict = Dict(1 => e1_params, 2 => e2_params)
+    [add_vertex!(g, vertex_dict[i]) for i = 1:length(vertex_dict)]
+    add_edge!(g, 1, 2, e1_params)
+    add_edge!(g, 2, 3, e2_params)
 
     # discretize network
     @variables t
