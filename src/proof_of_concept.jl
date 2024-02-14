@@ -172,8 +172,8 @@ function run_example()
     η = 1e-1
 
     #optimization loop
-    p0 = ones(length(params));
-    for i in 1:1000
+    p0 = ones(length(params))
+    for i = 1:1000
         println(loss(p0))
         gs = gradient(loss, p0)[1]
         p0 -= η * gs;
