@@ -159,9 +159,14 @@ function run_example()
     param_dt = 0.5
     params_tsteps = tspan[1]:param_dt:tspan[end]
     sys = create_system(g, t, dx, params)
-    sys = structural_simplify(sys);
-    prob = ODEProblem(sys, ones(length(sys.eqs)), tspan, Symbolics.scalarize(params.=>zeros(length(params))))
-    sol = solve(prob, Euler(), adaptive=false, dt=dt)
+    sys = structural_simplify(sys)
+    prob = ODEProblem(
+        sys,
+        ones(length(sys.eqs)),
+        tspan,
+        Symbolics.scalarize(params .=> zeros(length(params))),
+    )
+    sol = solve(prob, Euler(), adaptive = false, dt = dt)
 
     loss(p) = sum(abs2, 2.0 .- solve(prob, Euler(), adaptive=false, dt=dt, p=p)[end]);
     η = 1e-1;
