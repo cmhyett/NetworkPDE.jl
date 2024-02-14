@@ -1,5 +1,5 @@
 # NetworkPDE.jl: efficient solution and optimization of PDEs on networks via symbolic programming
-Note that this package is a work in progress! It relies on a fork of ModelingToolkit.jl (while we wait for a necessary PR to be integrated, https://github.com/cmhyett/ModelingToolkit.jl) to work.
+Note that this package is a work in progress! It relies on a fork of ModelingToolkit.jl (while we wait for a necessary PR to be integrated, https://github.com/cmhyett/ModelingToolkit.jl) to work. 
 
 We utilize symbolic infrastructure in Julia to streamline solving PDEs on networks. Of particular note is the state-of-the-art integration with reverse-mode automatic sensitivity analysis, allowing for efficient calculation of gradients even in high-dimensional parameterizations, and enabling a differentiable-programming approach to PDE-constrained optimization problems on networks.
 
