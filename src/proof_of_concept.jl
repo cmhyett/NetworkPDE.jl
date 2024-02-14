@@ -132,7 +132,7 @@ function create_system(g::AbstractGraph, t, dx, params)
     dvs = get_dvs(g);
 #    params = [(get_prop(g, v, :params)).value for v in vertices(g)]#get_params(g);
     @named de = ODESystem(eqs, t, dvs, [params...])
-    return de;
+    return de
 end
 
 function run_example()
