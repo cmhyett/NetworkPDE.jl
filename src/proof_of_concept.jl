@@ -155,8 +155,8 @@ function run_example()
     p(ρ) = 5^2 * ρ
     β = 0.001
     tspan = (0.0, 1.0)
-    dt = 0.25;
-    param_dt = 0.5;
+    dt = 0.25
+    param_dt = 0.5
     params_tsteps = tspan[1]:param_dt:tspan[end]
     sys = create_system(g, t, dx, params)
     sys = structural_simplify(sys);
