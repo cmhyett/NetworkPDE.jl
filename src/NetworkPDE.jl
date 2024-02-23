@@ -10,8 +10,10 @@ using Symbolics,
       Plots,
       NetworkLayout
 
-@register_symbolic Base.floor(T::Type, x)::UInt64
+#@register_symbolic Base.floor(T::Type, x)::UInt64
 
-include("proof_of_concept.jl")
+include("graph_interface.jl")
+#include("proof_of_concept.jl")
+
 
 end
