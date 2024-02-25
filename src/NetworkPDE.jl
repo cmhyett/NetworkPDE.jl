@@ -15,5 +15,4 @@ using Symbolics,
 include("graph_interface.jl")
 #include("proof_of_concept.jl")
 
-
 end
