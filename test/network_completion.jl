@@ -1,4 +1,4 @@
-using Test, NetworkPDE, ModelingToolkit, DomainSets
+using Test, NetworkPDE, ModelingToolkit, DomainSets, Zygote
 
 abstract type Pipe <: AbstractNetworkComponent end
 abstract type FluxNode <: AbstractNetworkComponent end
@@ -100,7 +100,7 @@ end
             return @. -(1 / dx) * (ϕ[2:end] - ϕ[1:(end - 1)])
         end
 
-        Finv(y, b) = y #sign.(y) .* ((-1 .+ sqrt.(1 .+ (4*b).*abs.(y)))./(2b))
+        Finv(y, b) = sign.(y) .* ((-1 .+ sqrt.(1 .+ (4*b).*abs.(y)))./(2b))
 
         function dϕ(ρ, ϕ, dx, dt, β, pressure_from_density)
             b = (β * dt) ./ (ρ[1:(end - 1)] + ρ[2:end])
@@ -127,7 +127,6 @@ end
     function instantiate(::Type{FluxNode}, comp::AbstractNetworkComponent; name)
         @parameters q
         @variables ρ(t)
-
         return ODESystem([0 ~ 0], t, [ρ], [q], name = name)
     end
 
