@@ -100,7 +100,7 @@ end
             return @. -(1 / dx) * (ϕ[2:end] - ϕ[1:(end - 1)])
         end
 
-        Finv(y, b) = sign.(y) .* ((-1 .+ sqrt.(1 .+ (4*b).*abs.(y)))./(2b))
+        Finv(y, b) = sign.(y) .* ((-1 .+ sqrt.(1 .+ (4 * b) .* abs.(y))) ./ (2b))
 
         function dϕ(ρ, ϕ, dx, dt, β, pressure_from_density)
             b = (β * dt) ./ (ρ[1:(end - 1)] + ρ[2:end])
@@ -158,14 +158,14 @@ end
             end
             push!(coupling_eqs,
                 Dt(node_ρ) * (1 / dt) * sum([edge_dxs[i] * cross_sections[i] for i in 1:num_inc_edges]) ~ node_q +
-                                                                                                      sum([(edge_dxs[i] /
-                                                                                                            dt) *
-                                                                                                           cross_sections[i] *
-                                                                                                           edge_ρs[i] -
-                                                                                                           sgns[i] *
-                                                                                                           cross_sections[i] *
-                                                                                                           edge_ϕs[i]
-                                                                                                           for i in 1:num_inc_edges]))
+                                                                                                          sum([(edge_dxs[i] /
+                                                                                                                dt) *
+                                                                                                               cross_sections[i] *
+                                                                                                               edge_ρs[i] -
+                                                                                                               sgns[i] *
+                                                                                                               cross_sections[i] *
+                                                                                                               edge_ϕs[i]
+                                                                                                               for i in 1:num_inc_edges]))
             for i in 1:num_inc_edges
                 push!(coupling_eqs,
                     Dt(edge_ϕs[i]) ~ sgns[i] * (pressure_from_density(node_ρ) -
