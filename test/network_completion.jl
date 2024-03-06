@@ -76,6 +76,7 @@ end
 @testset "completing dynamic network" begin
     Wave_Speed = 350
     @parameters t
+    Dt = Differential(t)
     net = create_network()
     pressure_from_density(density) = Wave_Speed^2 * density
     density_from_pressure(pressure) = pressure / Wave_Speed^2
@@ -87,7 +88,6 @@ end
 
     function instantiate(::Type{Pipe}, comp::AbstractNetworkComponent; name)
         #        @parameters x
-        Dt = Differential(t)
         #        Dx = Differential(x)
 
         L = get_metadata(comp, :L)
