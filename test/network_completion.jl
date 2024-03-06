@@ -6,9 +6,9 @@ abstract type FluxNode <: AbstractNetworkComponent end
 function create_network()
     dx = 50
     e1_params = Dict(
-        :L => 100.0, :λ => 0.0, :D => 0.25, :from_node => 1, :to_node => 2, :type => Pipe, :dx => dx)
+        :L => 100.0, :λ => 0.11, :D => 0.25, :from_node => 1, :to_node => 2, :type => Pipe, :dx => dx)
     e2_params = Dict(
-        :L => 150.0, :λ => 0.0, :D => 0.25, :from_node => 2, :to_node => 3, :type => Pipe, :dx => dx)
+        :L => 150.0, :λ => 0.11, :D => 0.25, :from_node => 2, :to_node => 3, :type => Pipe, :dx => dx)
     e1 = Edge(1, e1_params)
     e2 = Edge(2, e2_params)
 
@@ -127,7 +127,7 @@ end
     function instantiate(::Type{FluxNode}, comp::AbstractNetworkComponent; name)
         @parameters q
         @variables ρ(t)
-        return ODESystem([0 ~ 0], t, [ρ], [q], name = name)
+        return ODESystem(Equation[], t, [ρ], [q], name = name)
     end
 
     function connect(net::Network; name)
@@ -157,7 +157,7 @@ end
                 end
             end
             push!(coupling_eqs,
-                node_ρ * (1 / dt) * sum([edge_dxs[i] * cross_sections[i] for i in 1:num_inc_edges]) ~ node_q +
+                Dt(node_ρ) * (1 / dt) * sum([edge_dxs[i] * cross_sections[i] for i in 1:num_inc_edges]) ~ node_q +
                                                                                                       sum([(edge_dxs[i] /
                                                                                                             dt) *
                                                                                                            cross_sections[i] *
